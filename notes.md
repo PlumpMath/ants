@@ -10,6 +10,12 @@
 ;; -- saving ants.core appends another view to the dom "correctly"
 ;; -- lookup "pixi figwheel"
 ;;
+
+* Figure out how to make code reloadable (should solve the reloading problems).
+--
+--
+--
+
 ;; * Figure out how to get figwheel to call animate on reload.
 ;; -- How does requestAnimationFrame work?
 ;; -- How does figwheel update the js files?
