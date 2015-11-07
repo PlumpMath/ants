@@ -23,7 +23,7 @@
   [texture]
   (js/PIXI.Sprite. texture))
 
-(defn reset-stage
-  []
+(defn reset-stage []
+  "Removes all entities from the stage"
   (. ants.core/stage removeChildren))
 

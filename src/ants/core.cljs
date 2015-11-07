@@ -1,4 +1,4 @@
-(ns ^:figwheel-always ants.core
+(ns ants.core
   (:require-macros
     [ants.macros :refer [inspect breakpoint << >> local]]
     )
@@ -16,7 +16,7 @@
 (defn load-initial-game-data!
   []
   ;; Load the data into each of the corresponding data structures
-  (let [game-data data/initdata-game
+  (let [game-data data/initdata-renderer
         world-data data/initdata-world
         entity-data data/initdata-entities]
     (do
@@ -36,8 +36,8 @@
     (:stage-size-y @game-state)
     (:stage-background-color @game-state)))
 
-(defn attach-view
-  []
+(defn attach-view []
+  "Attaches the renderer to the DOM and sets its :id to pixi"
   (do
     (dommy/append! (sel1 :#app) (.-view renderer))
     (dommy/set-attr! (sel1 [:#app :canvas]) :id "pixi")))
@@ -51,26 +51,33 @@
   []
   (u/log "Setup world called"))
 
+(defn setup-entity
+  "From the info in the entity map:
+  * Creates the texture
+  * Creates the sprite
+  * Sets the inital position
+  * Adds the sprite to the stage"
+  [entity]
+  (let [texture (p/create-texture (:texture entity))
+        sprite (p/create-sprite texture)
+        xpos (:start-pos-x entity)
+        ypos (:start-pos-y entity)]
+    (set! (.-position.x sprite) xpos )
+    (set! (.-position.y sprite) ypos )
+    (. stage addChild sprite)
+    (. renderer render stage)
+    ))
+
 (defn setup-entities
-  "Takes the data in the entity-state map and sets up the corresponding elements"
+  "Calls setup-entity for all entities in the entities atom"
   []
-  (u/log "Setup entitles called"))
-
-(def bunnytexture (p/create-texture "images/bunny.png"))
-(def bunny (p/create-sprite bunnytexture))
-(set! (.-position.x bunny) 200)
-(set! (.-position.y bunny) 150)
-(. stage addChild bunny)
-
-(def foo5 nil)
-
-(defn create-random-bunny
-  "creates a bunny with a random x and y position"
-  []
-  (let [bunny (p/create-sprite (p/create-texture "images/bunny.png"))]
-    (set! (.-position.x bunny) (rand-int (:stage-size-x @game-state)))
-    (set! (.-position.y bunny) (rand-int (:stage-size-y @game-state)))
-    bunny))
+  (u/log "setup-entities called")
+  ; The dorun and doseq versions are the same but doseq is more idiomatic.
+  ;(dorun
+  ;  (map #(setup-entity %) @entity-state))
+  (doseq [e @entity-state]
+    (setup-entity e))
+  )
 
 (defn setup-all
   "Loads the initial game data and sets up game, world and entities"
@@ -80,19 +87,28 @@
     (setup-entities)))
 
 (defn animate
+  "Main game loop. Performs the following:
+  * Render the game stage
+  * Takes input (TBD)
+  * Moves the player (TBD)
+  * Performs collsion checks (TBD)
+  * Updates entities (TBD)
+  * Requests animation frame
+  * Repeats"
   []
-  (do
-    (. renderer render stage)
-    (js/requestAnimationFrame animate)
-    (set! (.-rotation bunny) (+ 0.02 (.-rotation bunny)))
-    ))
+  ; Render the game stage
+  (. renderer render stage)
+  ; Requests animation frame and calls itself
+  (js/requestAnimationFrame animate)
+  )
 
-(defn main
+(defn init
   []
-  (do
-    (if-not (sel1 :#pixi)
-      (attach-view))
-    (animate)))
+  (if-not (sel1 :#pixi)
+    (attach-view))
+  (setup-all)
+  (animate)
+  )
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
@@ -102,4 +118,4 @@
   )
 
 ;; ;; Start the game on page load
-(set! (.-onload js/window) main)
+(set! (.-onload js/window) init)
