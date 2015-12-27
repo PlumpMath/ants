@@ -1,24 +1,51 @@
 (ns ants.core
   (:require-macros
-    [ants.macros :refer [inspect breakpoint << >> local]]
-    )
-  (:require [ants.pixi :as p]
+    [ants.macros :refer [inspect breakpoint << >> local]])
+  (:require [ants.ces :as ces]
+    [ants.pixi :as p]
             [ants.initdata :as data]
             [ants.utils :as u]
             [dommy.core :as dommy :refer-macros [sel sel1]]))
 
+;; Chocolatier source on github: https://github.com/alexkehayias/chocolatier
+;; Recent Functional Game Design:
+;; http://htmlpreview.github.io/?https://raw.githubusercontent.com/alexkehayias/functional-game-engine-design/master/game_engine_design.html#/sec-title-slide
+;; CES Presentation:
+;; http://www.slideshare.net/alexkehayias/clojure-script-game-engine-overview
+
+
 (enable-console-print!)
+
+;; to get something working we're going to use the simplest state possible, pre-initialized with the world:
+(defonce state {:scenes [{:id :scene01
+                          :game [:movement :collision :rendering]}]
+                :systems [{:movement movement-sys-fn
+                           :collision collision-sys-fn
+                           :rendering rendering-sys-fn}]
+                :components [{:antcomp [:movable :collidable :renderable]}]
+                :entities [{:ant01 [[:movable {:x 15 :y 25}]
+                                    :collidable
+                                    :renderable {:texture "images/ant-sm.png" }]}
+                           {:ant02 [[:movable {:x 150 :y 250}]
+                                    :collidable
+                                    :renderable {:texture "images/ant-sm.png" }]}
+                           {:ant03 [[:movable {:x 250 :y 300}]
+                                    :collidable
+                                    :renderable {:texture "images/ant-sm.png" }]}]
+                })
 
 (defonce game-state (atom {}))
 (defonce world-state (atom {}))
 (defonce entity-state (atom {}))
 
+;(data/load-initial-game-data!)
+
 (defn load-initial-game-data!
   []
   ;; Load the data into each of the corresponding data structures
-  (let [game-data data/initdata-renderer
-        world-data data/initdata-world
-        entity-data data/initdata-entities]
+  (let [game-data initdata-renderer
+        world-data initdata-world
+        entity-data initdata-entities]
     (do
       (reset! game-state game-data)
       (reset! world-state world-data)
@@ -26,8 +53,6 @@
       (inspect world-state)
       (inspect game-state)
       (inspect entity-state))))
-
-(load-initial-game-data!)
 
 ;; Create an empty renderer
 (def renderer
@@ -62,8 +87,8 @@
         sprite (p/create-sprite texture)
         xpos (:start-pos-x entity)
         ypos (:start-pos-y entity)]
-    (set! (.-position.x sprite) xpos )
-    (set! (.-position.y sprite) ypos )
+    (set! (.-position.x sprite) xpos)
+    (set! (.-position.y sprite) ypos)
     (. stage addChild sprite)
     (. renderer render stage)
     ))
@@ -85,6 +110,7 @@
   (do
     (setup-world)
     (setup-entities)))
+
 
 (defn animate
   "Main game loop. Performs the following:

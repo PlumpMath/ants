@@ -1,4 +1,6 @@
-(ns ants.initdata)
+(ns ants.initdata
+  ;(:require [ants.core :as ants])
+  )
 ;; ^:figwheel-no-load prevents figwheel from re-appending the stage to the dom each time ants.core is compiled
 
 (def initdata-renderer
@@ -15,15 +17,18 @@
   {})
 
 (def initdata-entities
- [{:texture "images/bunny.png"
+ [{:texture "images/ant-sm.png"
    :start-pos-x 200
    :start-pos-y 150}
-  {:texture "images/bunny.png"
+  {:texture "images/ant-sm.png"
    :start-pos-x 150
    :start-pos-y 250}
-  {:texture "images/bunny.png"
+  {:texture "images/ant-sm.png"
    :start-pos-x 215
-   :start-pos-y 56}])
+   :start-pos-y 56}
+  ])
+
+
 
 ;(def initdata-entities
 ;  {
