@@ -5,14 +5,17 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "0.0-3297"]
+                 [org.clojure/clojurescript "1.7.228"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [prismatic/dommy "1.1.0"]]
+                 [prismatic/dommy "1.1.0"]
+                 [figwheel-sidecar "0.5.0-3"]
+                 [aprint "0.1.3"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]
-            [lein-figwheel "0.3.7"]]
+            ;[lein-figwheel "0.5.0-3"]
+            ]
 
-  :source-paths ["src"]
+  :source-paths ["src" "scripts"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
@@ -57,7 +60,7 @@
              ;; #! /bin/sh
              ;; emacsclient -n +$2 $1
              ;;
-             ;; :open-file-command "myfile-opener"
+             :open-file-command "open-in-intellij"
 
              ;; if you want to disable the REPL
              ;; :repl false
